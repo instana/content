@@ -1,0 +1,29 @@
+# IBM MQ test jar
+
+The purpose of this jar is to test if IBM MQ is configured well and is able to be connected. There are two connection mode you can choose:
+
+1. Local binding mode
+With this mode, the only parameter you need to provide is the IBM MQ lib path when you want to try the IBM MQ connection. If you try this mode, you need to run this jar on the same server where the IBM MQ is running.
+
+2. Client binding mode
+With this mode, you need to provide the channel name and channel port to try the IBM MQ connection. If the IBM MQ channel is security enabled, username and password is also needed. If you try this mode, you can run this jar on other server or the same server that the IBM MQ is running. 
+
+## Usage
+
+You can get the whole usge with the command:
+java -jar ./testMQ.jar 
+
+The output is like:
+If you want to try local binding. The usage is: 
+    java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
+
+If you want to try client binding. The usage is:
+    java -jar ./testMQ.jar -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
+
+Here are the examples:
+
+1. Local binding mode:
+java -jar ./testMQ.jar -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
+
+2. Client binding mode:
+java -jar ./testMQ.jar -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
