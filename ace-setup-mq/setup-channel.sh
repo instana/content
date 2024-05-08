@@ -113,7 +113,7 @@ prepChannelAndTopic(){
     fi
 }
 
-# 4. Print out useful info you need in setting configuration.yaml
+# 5. Print out useful info you need in setting configuration.yaml
 printConnInfo(){
     echo -e "\033[1;32mHint: Please set the configuration.yaml for ACE sensor with following info:\033[0m"
     echo -e "\033[1;32m queuemanagerName:  $QMGR_NAME\033[0m"
