@@ -19,7 +19,7 @@ preCheck(){
     if groups | grep -q '\bmqm\b'; then
         echo -e "\033[1;32mINFO:The user who launches the script belongs to mqm group\033[0m"
     else
-        echo -e "\033[1;31mERROR:The user launches the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
+        echo -e "\033[1;31mERROR:The user who launches the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
         exit 1
     fi
 
@@ -34,15 +34,17 @@ preCheck(){
 # 2. Set correct authority for $AUTH_USER to access QMGR.
 setQmgrAuth(){
     echo -e "\033[1;33mINFO: set authority for user $AUTH_USER to access QMGR.\033[0m"
-    RESULT=$(echo "setmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER +connect +inq")
+    RESULT=$(echo "setmqaut -m "$QMGR_NAME" -t qmgr -p "$AUTH_USER" +connect +inq" 2>&1)
     if [[ "$RESULT" != *"completed successfully"* ]]; then
        echo -e "\033[1;31mERROR: failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
        echo -e "\033[1;31m$RESULT\033[0m"
        exit 1
     else
-        echo "dmpmqaut -m $QMGR_NAME -t qmgr"
+        echo -e "\033[1;33mINFO: The authority has been set succesfully for user $AUTH_USER\033[0m"
+        echo "$(dmpmqaut -m $QMGR_NAME -t qmgr 2>&1)"
     fi
 }
+
 # 3. Print out all available listener ports
 getListenerPort(){
     listener_ports=$(echo "dis LISTENER(*) PORT" | runmqsc "$QMGR_NAME" |  grep -oP 'PORT\(\K\d+')
