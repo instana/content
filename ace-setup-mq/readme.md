@@ -8,7 +8,7 @@ The script `setup-channel.sh` is used to create resources and set authority prop
 2. Set it executable `chmod +x setup-channel.sh`
 3. Go to the directory and execute the script
 ```sh
-    ./setup-channel.sh <QMGR_NAME>  <MQ_BIN_PATH>  <AUTH_USER>
+    ./setup-channel.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
 ```
 # Instructions for remove-resources.sh
 ## Descriptions
