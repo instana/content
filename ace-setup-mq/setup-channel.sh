@@ -9,6 +9,7 @@ printUsage(){
     echo "4. Check the connectivity of the channel with specified user"
     echo "5. Define a topic or use existing topic object for topic string '$SYS/Broker' and set authrec for it"
     echo "6. List the useful info you can use to set in configuration.yaml for plugin.ace"
+    echo -e "\033[1;31mNote: this script will cover most cases, but sometimes if you fail to create the mq objects, please contact IBM Instana support or contact IBM MQ support team for help. \033[0m"
     echo -e "\033[1;33mUsage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> -u <AUTH_USER>\033[0m"
     echo -e "\033[1;33mExample $0 -q QM1 -d /opt/mqm/bin -u root\033[0m"
 }
@@ -34,7 +35,7 @@ preCheck(){
 setQmgrAuth(){
     echo -e "\033[1;33mINFO: set authority for user $AUTH_USER to access QMGR.\033[0m"
     RESULT=$(echo "setmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER +connect +inq")
-    if [[ "$RESULT" != *"completed successfully"*]]; then
+    if [[ "$RESULT" != *"completed successfully"* ]]; then
        echo -e "\033[1;31mERROR: failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
        echo -e "\033[1;31m$RESULT\033[0m"
        exit 1
