@@ -9,8 +9,8 @@ printUsage(){
     echo "4. Check the connectivity of the channel with specified user"
     echo "5. Define a topic or use existing topic object for topic string '$SYS/Broker' and set authrec for it"
     echo "6. List the useful info you can use to set in configuration.yaml for plugin.ace"
-    echo -e "\033[1;33mUsage: $0 <QMGR_NAME> <MQ_BIN_PATH> <AUTH_USER>\033[0m"
-    echo -e "\033[1;33mExample $0 QM1 /opt/mqm/bin root\033[0m"
+    echo -e "\033[1;33mUsage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> -u <AUTH_USER>\033[0m"
+    echo -e "\033[1;33mExample $0 -q QM1 -d /opt/mqm/bin -u root\033[0m"
 }
 
 # 1. Check the current user has authority to execute MQSC commands
@@ -33,9 +33,14 @@ preCheck(){
 # 2. Set correct authority for $AUTH_USER to access QMGR.
 setQmgrAuth(){
     echo -e "\033[1;33mINFO: set authority for user $AUTH_USER to access QMGR.\033[0m"
-    setmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER +connect +inq
-    echo -e "\033[1;32m$(dmpmqaut -m $QMGR_NAME -t qmgr)\033[0m"
-    # 
+    RESULT=$(echo "setmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER +connect +inq")
+    if [[ "$RESULT" != *"completed successfully"*]]; then
+       echo -e "\033[1;31mERROR: failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
+       echo -e "\033[1;31m$RESULT\033[0m"
+       exit 1
+    else
+        echo "dmpmqaut -m $QMGR_NAME -t qmgr"
+    fi
 }
 # 3. Print out all available listener ports
 getListenerPort(){
@@ -57,7 +62,8 @@ getListenerPort(){
             AVAILABLE_PORTS+=" $LISTENER_PORT"
             echo -e "\033[1;32mINFO: Port $LISTENER_PORT is open and accepting connections.\033[0m"
         else
-            echo -e "\033[1;31mERROR: Port $LISTENER_PORT is not open or not accepting connections.\033[0m" 
+            echo -e "\033[1;31mERROR: Port $LISTENER_PORT is not open or not accepting connections. Please check and fix.\033[0m" 
+            exit 1
         fi
     fi
 }
@@ -103,6 +109,7 @@ prepChannelAndTopic(){
         if [[ $EXISTING_AUTHREC == *"not found"* ]]; then
             echo -e "\033[1;31mERROR:AUTHREC for topic '$TOPIC_NAME' does not exist.Please check the commands execution result\033[0m"
             echo "$EXISTING_AUTHREC"
+            exit 1
         else
             echo -e "\033[1;32mINFO:AUTHREC for topic '$TOPIC_NAME' exists.\033[0m"
         fi
@@ -128,20 +135,32 @@ printConnInfo(){
 
 # 0: Init
 # Define the variables 
-QMGR_NAME=$1
-MQ_BIN_PATH=$2
-AUTH_USER=$3
 CHANNEL_NAME='INSTANA.ACE.SVRCONN'
 TOPIC_NAME='INSTANA.ACE.BROKER.TOPIC'
 TOPIC_STR='$SYS/Broker'
 LISTENER_NAME='INSTANA.ACE.LS'
 LISTENER_PORT='2121'
 AVAILABLE_PORTS=''
-# Check the number of parameters
-if [ "$#" -ne 3 ]; then
-    printUsage
-    exit 1    
-fi  
+# Check the parameters
+while getopts ":q:d:u:" opt; do
+    case ${opt} in
+        q)
+          QMGR_NAME=${OPTARG}
+          ;;
+        d)
+          MQ_BIN_PATH=${OPTARG}
+          ;;
+        u)
+          AUTH_USER=${OPTARG}
+          ;;
+        ?)
+          printUsage
+          exit 1
+          ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
 # Setup mq environment to accept mqsc command. 
 echo "INFO: setup mq environment to accept mqsc command"
 . $MQ_BIN_PATH/setmqenv -s
