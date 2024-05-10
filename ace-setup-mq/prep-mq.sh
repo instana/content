@@ -16,13 +16,15 @@ printUsage(){
 
 # 1. Check the current user has authority to execute MQSC commands
 preCheck(){
-    if groups | grep -q '\bmqm\b'; then
+    # Check user authority
+    if groups | tr ' ' '\n' | grep -q '^mqm$'; then
         echo -e "\033[1;32mINFO: The user launched the script belongs to mqm group\033[0m"
     else
         echo -e "\033[1;31mERROR: The user launched the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
         exit 1
     fi
 
+    # check mq bin path 
     echo "Check the MQ_BIN_PATH exists and file setmqenv exists"
     if [ ! -d "$MQ_BIN_PATH" ] || [ ! -f "$MQ_BIN_PATH/setmqenv" ]; then
         echo -e "\033[1;31mERROR: The path $MQ_BIN_PATH or the file $MQ_BIN_PATH/setmqenv does not exist or both don't exist.\033[0m"
@@ -30,24 +32,37 @@ preCheck(){
     else
         echo -e "\033[1;32mINFO: The $MQ_BIN_PATH and related file setmqenv exist.\033[0m"
     fi
+
+    # Setup mq environment to accept mqsc command. 
+    echo -e "\033[1;33mINFO: Setup mq environment to accept mqsc command\033[0m"
+    . $MQ_BIN_PATH/setmqenv -s 
+    if [ $? -eq 0 ]; then
+       echo -e "\033[1;32mINFO: The environment has been set successfully. \033[0m"
+    else
+       echo -e "\033[1;31mERROR: Failed to set the environment\033[0m"
+       exit 1
+    fi
 }
 # 2. Set correct authority for $AUTH_USER to access QMGR.
 setQmgrAuth(){
     echo -e "\033[1;33mINFO: Set authority for user $AUTH_USER to access QMGR.\033[0m"
-    RESULT=$(echo "setmqaut -m "$QMGR_NAME" -t qmgr -p "$AUTH_USER" +connect +inq" 2>&1)
-    if [[ "$RESULT" != *"completed successfully"* ]]; then
-       echo -e "\033[1;31mERROR: Failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
-       echo -e "\033[1;31m$RESULT\033[0m"
-       exit 1
+    echo "The user $AUTH_USER has following authority before setting:"
+    echo  "$(dmpmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER)"
+    setmqaut -m "$QMGR_NAME" -t qmgr -p "$AUTH_USER" +connect +inq
+    if [ $? -eq 0 ]; then
+        echo -e "\033[1;32mINFO: The authority has been set succesfully for user $AUTH_USER\033[0m"
+        echo "The user $AUTH_USER has following authority after setting:"
+        echo  "$(dmpmqaut -m $QMGR_NAME -t qmgr -p $AUTH_USER 2>&1)"
     else
-        echo -e "\033[1;33mINFO: The authority has been set succesfully for user $AUTH_USER\033[0m"
-        echo "$(dmpmqaut -m $QMGR_NAME -t qmgr 2>&1)"
+        echo -e "\033[1;31mERROR: Failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
+        echo -e "\033[1;31m$RESULT\033[0m"
+        exit 1
     fi
 }
 
 # 3. Print out all available listener ports
 getListenerPort(){
-    listener_ports=$(echo "dis LISTENER(*) PORT" | runmqsc "$QMGR_NAME" |  grep -oP 'PORT\(\K\d+')
+    listener_ports=$(echo "dis LISTENER(*) PORT" | runmqsc "$QMGR_NAME" | awk '/PORT/ {gsub("[^0-9]", "", $NF); print $NF}')
     if [ -n "$listener_ports" ]; then
        while read -r port; do
             if checkPort $port; then
@@ -73,7 +88,12 @@ getListenerPort(){
 
 checkPort() {
     local port="$1"
-    nc -zv localhost "$port" >/dev/null 2>&1
+    os_type=$(uname -s)
+    if [[ "$os_type" == "Linux" ]]; then 
+        nc -zv localhost "$port" >/dev/null 2>&1
+    else
+        telnet localhost "$port" >/dev/null 2>&1
+    fi
 }
 
 # 4. Create channel and topic, set authrec for them.
@@ -81,7 +101,9 @@ prepChannelAndTopic(){
     CHECK_CHANNEL=$(echo "DISPLAY CHANNEL($CHANNEL_NAME)" | runmqsc "$QMGR_NAME")
     if [[ "$CHECK_CHANNEL" != *"not found"* ]]; then 
         echo -e "\033[1;31mERROR: The channel exists, please try another CHANNEL_NAME or delete the existing channel and rerun the script. \033[0m"
-        echo -e "\033[1;31mT$CHECK_CHANNEL\033[0m"
+        echo -e "\033[1;31mYou can use revert-mq.sh to delete this channel and revert all created objects:\033[0m"
+        echo -e "./revert-mq.sh -q $QMGR_NAME -d $MQ_BIN_PATH -u $AUTH_USER -l $LISTENER_NAME -c $CHANNEL_NAME"
+        echo "$CHECK_CHANNEL"
         exit 1
     fi
     # Execute the MQSC commands
@@ -127,7 +149,7 @@ prepChannelAndTopic(){
 printConnInfo(){
     echo -e "\033[1;32mHint: Please set the configuration.yaml for ACE sensor with following info:\033[0m"
     echo -e "\033[1;32m queuemanagerName:  $QMGR_NAME\033[0m"
-    echo -e "\033[1;32m mqport:           $AVAILABLE_PORTS\033[0m"
+    echo -e "\033[1;32m mqport:           $AVAILABLE_PORTS (choose one)\033[0m"
     echo -e "\033[1;32m channel:           $CHANNEL_NAME\033[0m"
     echo -e "\033[1;32m mqUsername:        $AUTH_USER\033[0m"
     echo -e "\033[1;32mThis tool only covers basic info, for other info, like user password and SSL related info, please check manually and set properly.\033[0m"
@@ -141,7 +163,7 @@ printConnInfo(){
 CHANNEL_NAME='INSTANA.ACE.SVRCONN'
 TOPIC_NAME='INSTANA.ACE.BROKER.TOPIC'
 TOPIC_STR='$SYS/Broker'
-LISTENER_NAME='INSTANA.ACE.LS'
+LISTENER_NAME='INSTANA.ACE.LST'
 LISTENER_PORT='2121'
 AVAILABLE_PORTS=''
 # Check the parameters
@@ -164,9 +186,14 @@ while getopts ":q:d:u:" opt; do
 done
 shift $(($OPTIND - 1))
 
-# Setup mq environment to accept mqsc command. 
-echo "INFO: setup mq environment to accept mqsc command"
-. $MQ_BIN_PATH/setmqenv -s
+if [[ -z "$QMGR_NAME" || -z "$MQ_BIN_PATH" || -z "$AUTH_USER" ]]; then
+    echo -e "\033[1;31mERROR: These arguments are required, but seems they are not set correctly."
+    echo "QMGR_NAME: $QMGR_NAME"
+    echo "MQ_BIN_PATH: $MQ_BIN_PATH"
+    echo "AUTH_USER:$AUTH_USER"
+    printUsage
+    exit 1
+fi
 
 # Define the MQSC commands fro channel creating
 read -r -d '' MQSC_CHECK_CHANNEL << EOF
