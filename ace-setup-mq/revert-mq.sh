@@ -13,18 +13,18 @@ printUsage() {
 preCheck() {
     echo "Check if current user has the authority to execute MQSC commands"
     if groups | grep -q '\bmqm\b'; then
-        echo -e "\033[1;32mINFO:The user launched the script belongs to mqm group\033[0m"
+        echo -e "\033[1;32mINFO: The user launched the script belongs to mqm group\033[0m"
     else
-        echo -e "\033[1;31mERROR:The user who launches the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
+        echo -e "\033[1;31mERROR: The user launched the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
         exit 1
     fi
 
     echo "Check the MQ_BIN_PATH exists and file setmqenv exists"
     if [ ! -d "$MQ_BIN_PATH" ] || [ ! -f "$MQ_BIN_PATH/setmqenv" ]; then
-        echo -e "\033[1;31mERROR: the path $MQ_BIN_PATH or the file $MQ_BIN_PATH/setmqenv does not exist or both don't exist.\033[0m"
+        echo -e "\033[1;31mERROR: The path $MQ_BIN_PATH or the file $MQ_BIN_PATH/setmqenv does not exist or both don't exist.\033[0m"
         exit 1
     else
-        echo -e "\033[1;32mINFO: the $MQ_BIN_PATH and related file setmqenv exist.\033[0m"
+        echo -e "\033[1;32mINFO: The $MQ_BIN_PATH and related file setmqenv exist.\033[0m"
     fi    
 }
 # 2. remove authority to qmgr for specified user
@@ -36,24 +36,24 @@ removeQmgrAuth(){
 # 3. delete objects
 deleteObjects() {
     if [ -n "$LISTENER_NAME" ]; then 
-        echo  -e "\033[1;33mINFO: delete listener object033[0m"
+        echo  -e "\033[1;33mINFO: Delete listener object033[0m"
         echo "stop LISTENER($LISTENER_NAME) IGNSTATE(NO)"  | runmqsc "$QMGR_NAME"
         echo "delete LISTENER($LISTENER_NAME) IGNSTATE(NO)" | runmqsc "$QMGR_NAME"
     else 
-        echo -e "\033[1;32mINFO: nothing to delete as the listener name $LISTENER_NAME is empty\033[0m"
+        echo -e "\033[1;32mINFO: Nothing to delete as the listener name $LISTENER_NAME is empty\033[0m"
     fi
 
     if [ -n "$CHANNEL_NAME" ]; then 
-        echo  -e "\033[1;33mINFO: delete channel object033[0m"
+        echo  -e "\033[1;33mINFO: Delete channel object033[0m"
         echo "delete channel($CHANNEL_NAME) IGNSTATE(YES)" | runmqsc "$QMGR_NAME"
     else 
-        echo -e "\033[1;32mINFO: nothing to delete as the channel name $CHANNEL_NAME is empty\033[0m"
+        echo -e "\033[1;32mINFO: Nothing to delete as the channel name $CHANNEL_NAME is empty\033[0m"
     fi
     if [ -n "$TOPIC_NAME" ]; then 
-        echo  -e "\033[1;33mINFO: delete topic object033[0m"
+        echo  -e "\033[1;33mINFO: Delete topic object033[0m"
         echo "delete topic($TOPIC_NAME) AUTHREC(YES)"  | runmqsc "$QMGR_NAME"
     else 
-        echo -e "\033[1;32mINFO: nothing to delete as the topic name $TOPIC_NAME is empty\033[0m"
+        echo -e "\033[1;32mINFO: Nothing to delete as the topic name $TOPIC_NAME is empty\033[0m"
     fi
 }
 
@@ -88,7 +88,7 @@ done
 shift $(($OPTIND - 1))
 
 # Setup mq environment to accept mqsc command. 
-echo -e "\033[1;33mINFO: setup mq environment to accept mqsc command\033[0m"
+echo -e "\033[1;33mINFO: Setup mq environment to accept mqsc command\033[0m"
 . $MQ_BIN_PATH/setmqenv -s
 
 # Call functions

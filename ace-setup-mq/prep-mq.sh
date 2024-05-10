@@ -17,26 +17,26 @@ printUsage(){
 # 1. Check the current user has authority to execute MQSC commands
 preCheck(){
     if groups | grep -q '\bmqm\b'; then
-        echo -e "\033[1;32mINFO:The user who launches the script belongs to mqm group\033[0m"
+        echo -e "\033[1;32mINFO: The user launched the script belongs to mqm group\033[0m"
     else
-        echo -e "\033[1;31mERROR:The user who launches the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
+        echo -e "\033[1;31mERROR: The user launched the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
         exit 1
     fi
 
     echo "Check the MQ_BIN_PATH exists and file setmqenv exists"
     if [ ! -d "$MQ_BIN_PATH" ] || [ ! -f "$MQ_BIN_PATH/setmqenv" ]; then
-        echo -e "\033[1;31mERROR: the path $MQ_BIN_PATH or the file $MQ_BIN_PATH/setmqenv does not exist or both don't exist.\033[0m"
+        echo -e "\033[1;31mERROR: The path $MQ_BIN_PATH or the file $MQ_BIN_PATH/setmqenv does not exist or both don't exist.\033[0m"
         exit 1
     else
-        echo -e "\033[1;32mINFO: the $MQ_BIN_PATH and related file setmqenv exist.\033[0m"
+        echo -e "\033[1;32mINFO: The $MQ_BIN_PATH and related file setmqenv exist.\033[0m"
     fi
 }
 # 2. Set correct authority for $AUTH_USER to access QMGR.
 setQmgrAuth(){
-    echo -e "\033[1;33mINFO: set authority for user $AUTH_USER to access QMGR.\033[0m"
+    echo -e "\033[1;33mINFO: Set authority for user $AUTH_USER to access QMGR.\033[0m"
     RESULT=$(echo "setmqaut -m "$QMGR_NAME" -t qmgr -p "$AUTH_USER" +connect +inq" 2>&1)
     if [[ "$RESULT" != *"completed successfully"* ]]; then
-       echo -e "\033[1;31mERROR: failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
+       echo -e "\033[1;31mERROR: Failed to set the authority for user $AUTH_USER to $QMGR_NAME\033[0m"
        echo -e "\033[1;31m$RESULT\033[0m"
        exit 1
     else
@@ -80,7 +80,7 @@ checkPort() {
 prepChannelAndTopic(){
     CHECK_CHANNEL=$(echo "DISPLAY CHANNEL($CHANNEL_NAME)" | runmqsc "$QMGR_NAME")
     if [[ "$CHECK_CHANNEL" != *"not found"* ]]; then 
-        echo -e "\033[1;31mERROR:The channel exists, please try another CHANNEL_NAME or delete the existing channel and rerun the script. \033[0m"
+        echo -e "\033[1;31mERROR: The channel exists, please try another CHANNEL_NAME or delete the existing channel and rerun the script. \033[0m"
         echo -e "\033[1;31mT$CHECK_CHANNEL\033[0m"
         exit 1
     fi
@@ -92,7 +92,7 @@ prepChannelAndTopic(){
     EXPECTED_OUTPUT="AMQ9783I: Channel will run using MCAUSER('$AUTH_USER')."                     
 
     if [[ "$OUTPUT" == *"$EXPECTED_OUTPUT"* ]]; then
-        echo -e "\033[1;32mINFO:The channel authority is set successfully with output:\033[0m"
+        echo -e "\033[1;32mINFO: The channel authority is set successfully with output:\033[0m"
         echo -e "\033[1;32m$EXPECTED_OUTPUT\033[0m"
         EXISTING_TOPIC=$(echo "dis TOPIC(*) WHERE(TOPICSTR EQ '$TOPIC_STR')" | runmqsc "$QMGR_NAME")
         # Create a topic if it doesn't exist
@@ -100,7 +100,7 @@ prepChannelAndTopic(){
             echo "Topic object with TOPICSTR '$TOPIC_STR' not found. Creating a new one..."
             echo "DEFINE TOPIC($TOPIC_NAME) TOPICSTR('$TOPIC_STR')" | runmqsc "$QMGR_NAME"
         else
-            echo -e "\033[1;32mINFO:Topic object with TOPICSTR '$TOPIC_STR' already exists.\033[0m"
+            echo -e "\033[1;32mINFO: Topic object with TOPICSTR '$TOPIC_STR' already exists.\033[0m"
             TOPIC_NAME=$(echo "$EXISTING_TOPIC" | sed -n '/TOPIC(\*/d; s/^.*TOPIC(\([^)]*\)).*$/\1/p')
         fi
         # Set authrec for the topic
@@ -110,14 +110,14 @@ prepChannelAndTopic(){
         EXISTING_AUTHREC=$(echo "DIS AUTHREC PROFILE($TOPIC_NAME) OBJTYPE(TOPIC)" | runmqsc "$QMGR_NAME")
         # Print the result 
         if [[ $EXISTING_AUTHREC == *"not found"* ]]; then
-            echo -e "\033[1;31mERROR:AUTHREC for topic '$TOPIC_NAME' does not exist.Please check the commands execution result\033[0m"
+            echo -e "\033[1;31mERROR: AUTHREC for topic '$TOPIC_NAME' does not exist.Please check the commands execution result\033[0m"
             echo "$EXISTING_AUTHREC"
             exit 1
         else
-            echo -e "\033[1;32mINFO:AUTHREC for topic '$TOPIC_NAME' exists.\033[0m"
+            echo -e "\033[1;32mINFO: AUTHREC for topic '$TOPIC_NAME' exists.\033[0m"
         fi
     else
-        echo -e "\033[1;31mERROR:The channel authority is failed to set. Check the blocking AUTHREC and fix it.\033[0m"
+        echo -e "\033[1;31mERROR: The channel authority is failed to set. Check the blocking AUTHREC and fix it.\033[0m"
         echo -e "$OUTPUT"
         exit 1
     fi
@@ -131,8 +131,8 @@ printConnInfo(){
     echo -e "\033[1;32m channel:           $CHANNEL_NAME\033[0m"
     echo -e "\033[1;32m mqUsername:        $AUTH_USER\033[0m"
     echo -e "\033[1;32mThis tool only covers basic info, for other info, like user password and SSL related info, please check manually and set properly.\033[0m"
-    echo -e  "\033[1;33mINFO: If you want to revert the authority and clean up the objects created,  please make sure you have downloaded the remove-resources.sh script and run like following: \033[0m"
-    echo "./remove-resources.sh -q $QMGR_NAME -d $MQ_BIN_PATH -u $AUTH_USER -l $LISTENER_NAME -c $CHANNEL_NAME -t $TOPIC_NAME"
+    echo -e  "\033[1;33mINFO: If you want to revert the authority and clean up the objects created,  please make sure you have downloaded the revert-mq.sh script and run like following: \033[0m"
+    echo "./revert-mq.sh -q $QMGR_NAME -d $MQ_BIN_PATH -u $AUTH_USER -l $LISTENER_NAME -c $CHANNEL_NAME -t $TOPIC_NAME"
 }
 
 
