@@ -13,7 +13,7 @@ printUsage() {
 preCheck() {
     echo "Check if current user has the authority to execute MQSC commands"
     if groups | grep -q '\bmqm\b'; then
-        echo -e "\033[1;32mINFO:The user launches the script belongs to mqm group\033[0m"
+        echo -e "\033[1;32mINFO:The user launched the script belongs to mqm group\033[0m"
     else
         echo -e "\033[1;31mERROR:The user who launches the script doesn't belong to mqm group, please use an authorized user to execute MQSC commands\033[0m"
         exit 1
