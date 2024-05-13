@@ -72,6 +72,9 @@ getListenerPort(){
                 echo -e "\033[1;33mWARNING: Port $port is not open or not accepting connections.\033[0m"
             fi
         done <<< "$listener_ports"
+    fi
+    if [ -n "$AVAILABLE_PORTS" ]; then
+        echo -e "\033[1;32mINFO: Found available ports: $AVAILABLE_PORTS\033[0m"
     else
         echo "Create a listener as there is no listener port found"
         echo "DEFINE LISTENER($LISTENER_NAME) TRPTYPE(TCP) PORT($LISTENER_PORT)" | runmqsc "$QMGR_NAME"
@@ -89,9 +92,21 @@ getListenerPort(){
 checkPort() {
     local port="$1"
     os_type=$(uname -s)
+    if [ -z "$port" ] || [ "$port" -eq 0 ]; then
+        echo -e "\033[1;31mERROR: Invalid port number: $port\033[0m"
+        return 1
+    fi
     if [[ "$os_type" == "Linux" ]]; then 
+        if ! command -v nc >/dev/null 2>&1; then
+            echo -e "\033[1;31mERROR: nc command not found: $port\033[0m"
+            return 1
+        fi
         nc -zv localhost "$port" >/dev/null 2>&1
     else
+        if ! command -v telnet >/dev/null 2>&1; then
+             echo -e "\033[1;31mERROR: telnet command not found: $port\033[0m"
+            return 1
+        fi
         telnet localhost "$port" >/dev/null 2>&1
     fi
 }
@@ -126,7 +141,7 @@ prepChannelAndTopic(){
             TOPIC_NAME=$(echo "$EXISTING_TOPIC" | sed -n '/TOPIC(\*/d; s/^.*TOPIC(\([^)]*\)).*$/\1/p')
         fi
         # Set authrec for the topic
-        echo "SET AUTHREC profile($TOPIC_NAME) objtype(topic) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)"
+        echo "$MQSC_SET_AUTH_4_TOPIC" | runmqsc "$QMGR_NAME"
         echo "Set authrec for the topic $TOPIC_NAME"
         # Verify the authrec exists
         EXISTING_AUTHREC=$(echo "DIS AUTHREC PROFILE($TOPIC_NAME) OBJTYPE(TOPIC)" | runmqsc "$QMGR_NAME")
@@ -200,6 +215,11 @@ read -r -d '' MQSC_CHECK_CHANNEL << EOF
 DEFINE CHANNEL($CHANNEL_NAME) CHLTYPE(SVRCONN) TRPTYPE(TCP) MCAUSER('$AUTH_USER')
 SET CHLAUTH($CHANNEL_NAME) TYPE(BLOCKUSER) USERLIST('nobody') DESCR('Block all users except authorized users')
 SET AUTHREC profile($CHANNEL_NAME) objtype(channel) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)
+REFRESH SECURITY
+EOF
+
+read -r -d '' MQSC_SET_AUTH_4_TOPIC << EOF
+SET AUTHREC profile($TOPIC_NAME) objtype(topic) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)
 REFRESH SECURITY
 EOF
 

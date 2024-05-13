@@ -1,6 +1,8 @@
+# Declaration
+The scripts are used to help user to prepare the MQ objects for ace monitoring. Users can modify these scripts on demand for different environments. As a assistant tool, we will not provide offical support to these scripts.
 # Supported OS
 Tested on Ubuntu 20.04, RHEL9.4, AIX 7.2. 
-# Instructions for setup-channel.sh
+# Instructions for prep-mq.sh
 ## Descriptions 
 The script `setup-channel.sh` is used to create resources and set authority properly in QMGR for ACE sensor. 
 * The script must be run with a user who belongs to mqm group and run on the machine which hosts the queue manager.
@@ -12,7 +14,7 @@ The script `setup-channel.sh` is used to create resources and set authority prop
 ```sh
     ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
 ```
-# Instructions for remove-resources.sh
+# Instructions for revert-mq.sh
 ## Descriptions
 The script `revert-mq.sh` is used to revert the authority granted with script `prep-revert.sh` and delete the objects created in QMGR for ACE sensor. 
 * The script must be run with a user who belongs to mqm group and run on the machine which hosts the queue manager.

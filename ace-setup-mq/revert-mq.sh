@@ -6,7 +6,7 @@ printUsage() {
     echo "2. Remove the qmgr authority(connect+inq) for the specified user"
     echo "3. Delete the specified listener/channel/topic"
     echo -e "\033[1;33m Usage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-l LISTENER_NAME] [-c CHANNEL_NAME] [-t TOPIC_NAME]\033[0m"
-    echo -e "\033[1;33m Example: $0 -q QM1 -d /opt/mqm/bin -u root -l LS2 -c INSTANA.ACE.SVRCONN -t INSTANA.ACE.BROKER.TOPIC\033[0m"
+    echo -e "\033[1;33m Example: $0 -q QM1 -d /opt/mqm/bin -u root -l INSTANA.ACE.LST -c INSTANA.ACE.SVRCONN -t INSTANA.ACE.BROKER.TOPIC\033[0m"
 }
 
 # 1. Check the current user has authority to execute MQSC commands
