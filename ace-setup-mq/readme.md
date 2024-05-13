@@ -1,5 +1,5 @@
 # Supported OS
-Linux (no test on zLinux) and AIX. 
+Tested on Ubuntu 20.04, RHEL9.4, AIX 7.2. 
 # Instructions for setup-channel.sh
 ## Descriptions 
 The script `setup-channel.sh` is used to create resources and set authority properly in QMGR for ACE sensor. 
