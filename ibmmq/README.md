@@ -10,20 +10,27 @@ The purpose of the IBM MQ connection test tool is to test whether IBM MQ is conf
 
 - You need to export the `JAVA_HOME` before you use the IBM MQ connection test tool.
 
-- You can obtain the usage with the command: ./testMQ.sh -help 
+- You can obtain the usage with the command: 
+
+  ```
+  ./testMQ.sh -help 
+  ```
+  {: codeblock}
 
 - To use the IBM MQ connection test tool in the local binding mode, run the following sample command: 
 
-```
-./testMQ.sh -m <qmgr-name> -a <lib-path> [-q <queueName>]
-```
+  ```
+  ./testMQ.sh -m <qmgr-name> -a <lib-path> [-q <queueName>]
+  ```
+  {: codeblock}
 
 For example, ./testMQ.sh -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
 
 - To use the IBM MQ connection test tool in the client binding mode, run the following sample command: 
 
-```
-./testMQ.sh -m <qmgr-name> -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
-```
+  ```
+  ./testMQ.sh -m <qmgr-name> -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
+  ```
+  {: codeblock}
 
 For example, ./testMQ.sh -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
