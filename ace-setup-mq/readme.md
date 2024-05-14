@@ -10,7 +10,7 @@ The following scripts help you to prepare the IBM MQ objects for ACE monitoring.
 # Instructions for running the `prep-mq.sh` script
 ## Descriptions
  
-The script `setup-channel.sh` creates resources and sets authority correctly in QMGR for the ACE sensor. 
+The script `prep-mq.sh` creates resources and sets authority correctly in QMGR for the ACE sensor. 
 * Run the script with a user who belongs to `mqm` group and on the machine that hosts the queue manager.
 * `AUTH_USER` in the script is the user that you want to grant authority. The user needn't be a privileged user.
  
