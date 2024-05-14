@@ -20,7 +20,6 @@ java -jar ./testMQ.jar -h <host> -p <port> -c <channel> [-u <user>] [-z <passwor
 
 For example, java -jar ./testMQ.jar -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
 
-Here are the examples:
 
 1. Local binding mode:
 java -jar ./testMQ.jar -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
