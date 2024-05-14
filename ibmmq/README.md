@@ -8,7 +8,7 @@ The purpose of the IBM MQ connection test tool is to test whether IBM MQ is conf
 
 ## Usage of the IBM MQ connection test tool
 
-- You need to export the `JAVA_HOME` before you use the IBM MQ connection test tool.
+- You need to export the `JAVA_HOME` environment variable before you use the IBM MQ connection test tool.
 
 - You can obtain the usage with the command: 
 
