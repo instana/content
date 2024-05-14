@@ -10,7 +10,10 @@ The purpose of the IBM MQ test JAR file is to test whether IBM MQ is configured 
 
 - You can get the whole usage with the command: java -jar ./testMQ.jar 
 
-If you want to try local binding. The usage is: 
+- To use the IBM MQ test JAR file in the local binding mode, run the following sample command: 
+java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
+
+For example, java -jar ./testMQ.jar -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
     java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
 
 If you want to try client binding. The usage is:
