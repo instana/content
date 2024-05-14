@@ -15,7 +15,10 @@ java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
 
 For example, java -jar ./testMQ.jar -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
 
-If you want to try client binding. The usage is:
+- To use the IBM MQ test JAR file in the client binding mode, run the following sample command: 
+java -jar ./testMQ.jar -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
+
+For example, java -jar ./testMQ.jar -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
     java -jar ./testMQ.jar -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
 
 Here are the examples:
