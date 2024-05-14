@@ -14,7 +14,6 @@ The purpose of the IBM MQ test JAR file is to test whether IBM MQ is configured 
 java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
 
 For example, java -jar ./testMQ.jar -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUNTING.QUEUE
-    java -jar ./testMQ.jar -m <qmgr-name> -a <lib-path> [-q <queueName>]
 
 If you want to try client binding. The usage is:
     java -jar ./testMQ.jar -h <host> -p <port> -c <channel> [-u <user>] [-z <password>] [-q <queueName>] [-k <keystore>] [-w <keystore-password>] -s [<ciph-suite>]
