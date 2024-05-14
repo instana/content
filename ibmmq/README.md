@@ -6,7 +6,7 @@ The purpose of the IBM MQ test JAR file is to test whether IBM MQ is configured 
 
 2. Client binding mode: Provide the channel name and channel port to use the IBM MQ connection. If the security is enabled for the IBM MQ channel, then you need a username and password to log in to the channel. By using client binding mode, you can run the IBM MQ test JAR file on another server or on the same server where the IBM MQ runs. 
 
-## Usage
+## Usage of the IBM MQ test JAR file
 
 You can get the whole usge with the command:
 java -jar ./testMQ.jar 
