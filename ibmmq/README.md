@@ -1,4 +1,4 @@
-# IBM MQ test jar
+# Testing the IBM MQ test JAR file
 
 The purpose of this jar is to test if IBM MQ is configured well and is able to be connected. There are two connection mode you can choose:
 
