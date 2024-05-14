@@ -7,8 +7,10 @@ The following scripts help you to prepare the IBM MQ objects for ACE monitoring.
 - Ubuntu 20.04
 - RHEL 9.4
 - AIX 7.2 
-# Instructions for running the `prep-mq.sh` script
-## Descriptions
+
+# `prep-mq.sh` script
+
+## Description
  
 The script `prep-mq.sh` creates resources and sets authority correctly in QMGR for the ACE sensor. 
 * Run the script with a user who belongs to `mqm` group and on the machine that hosts the queue manager.
@@ -17,20 +19,22 @@ The script `prep-mq.sh` creates resources and sets authority correctly in QMGR f
 ## Usage
 
 To run the `prep-mq.sh` script, complete the following steps:
+
 1. Download the `prep-mq.sh` script. 
 2. Make the script executable:
     ```
     chmod +x prep-mq.sh
     ```
     {: codeblock}
-3. Go to the directory, and run the script.
+3. Go to the directory, and run the script:
     ```sh
     ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
     ```
     {: codeblock}
-# Instructions for running the revert-mq.sh script
+    
+# `revert-mq.sh` script
 
-## Descriptions
+## Description
 
 The `revert-mq.sh` script reverts the authority granted with the `prep-revert.sh` script and deletes the objects created in QMGR for the ACE sensor. 
 * Run the script with a user who belongs to `mqm `group and on the machine which hosts the queue manager.
@@ -46,12 +50,9 @@ To run the `revert-mq.sh` script, complete the following steps:
     chmod +x revert-mq.sh
     ```
     {: codeblock}
-3. Go to the directory, and execute the script.
+3. Go to the directory, and run the script:
     ```sh
     ./revert-mq.sh -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-l LISTENER_NAME]  [-c CHANNEL_NAME]  [-t TOPIC_NAME]
     ```
     {: codeblock}
-
-
-
 
