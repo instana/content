@@ -2,7 +2,7 @@
 
 The purpose of the IBM MQ test JAR file is to test whether IBM MQ is configured and can be connected. You can select any of the following connection modes:
 
-1. Local binding mode
+1. Local binding mode: Provide the `IBM MQ lib` path parameter. You can run the IBM MQ test JAR file on the same server where the IBM MQ runs.
 With this mode, the only parameter you need to provide is the IBM MQ lib path when you want to try the IBM MQ connection. If you try this mode, you need to run this jar on the same server where the IBM MQ is running.
 
 2. Client binding mode
