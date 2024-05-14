@@ -1,29 +1,48 @@
 # Declaration
+
 The following scripts help you to prepare the IBM MQ objects for ACE monitoring. You can modify these scripts on demand for different environments. As an assistant tool, no official support to these scripts are provided.
 
 # Supported OS
-Tested on Ubuntu 20.04, RHEL9.4, AIX 7.2. 
-# Instructions for prep-mq.sh
-## Descriptions 
-The script `setup-channel.sh` is used to create resources and set authority properly in QMGR for ACE sensor. 
-* The script must be run with a user who belongs to mqm group and run on the machine which hosts the queue manager.
-* The AUTH_USER used in the script is the user that you want to grant authority and it doesn't need to be a privileged user. 
+
+- Ubuntu 20.04
+- RHEL9.4
+- AIX 7.2 
+# Instructions for running the `prep-mq.sh` script
+## Descriptions
+ 
+The script `setup-channel.sh` creates resources and sets authority correctly in QMGR for the ACE sensor. 
+* Run the script with a user who belongs to `mqm` group and on the machine that hosts the queue manager.
+* `AUTH_USER` in the script is the user that you want to grant authority. The user needn't be a privileged user.
+ 
 ## Usage
-1. Download the script `prep-mq.sh`
-2. Set it executable `chmod +x prep-mq.sh`
-3. Go to the directory and execute the script
+
+To run the `prep-mq.sh` script, complete the following steps:
+1. Download the `prep-mq.sh` script. 
+2. Make the script executable:
+    ```
+     chmod +x prep-mq.sh
+     ```
+     {: codeblock}
+3. Go to the directory, and run the script.
+
 ```sh
     ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
 ```
-# Instructions for revert-mq.sh
+# Instructions for running the revert-mq.sh script
+
 ## Descriptions
-The script `revert-mq.sh` is used to revert the authority granted with script `prep-revert.sh` and delete the objects created in QMGR for ACE sensor. 
-* The script must be run with a user who belongs to mqm group and run on the machine which hosts the queue manager.
-* The AUTH_USER used in the script is the user that you used in `prep-mq.sh`. 
+
+The `revert-mq.sh` script reverts the authority granted with the `prep-revert.sh` script and deletes the objects created in QMGR for the ACE sensor. 
+* Run the script with a user who belongs to `mqm `group and on the machine which hosts the queue manager.
+* `AUTH_USER` in the script is the user that you used in the `prep-mq.sh` script.
+ 
 ## Usage
-1. Download the script `revert-mq.sh`
+
+To run the `revert-mq.sh` script, complete the following steps:
+
+1. Download the `revert-mq.sh` script.
 2. Set it executable `chmod +x revert-mq.sh`
-3. Go to the directory and execute the script
+3. Go to the directory, and execute the script.
 ```sh
     ./revert-mq.sh -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-l LISTENER_NAME]  [-c CHANNEL_NAME]  [-t TOPIC_NAME]
 ```
