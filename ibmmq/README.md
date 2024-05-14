@@ -1,6 +1,6 @@
-# MQ connection test tool
+# IBM MQ connection test tool
 
-The purpose of the IBM MQ connection test tool is to test whether IBM MQ is configured and can be connected. You can select any of the following connection modes:
+The purpose of the IBM MQ connection test tool is to test whether IBM MQ is configured and can be connected. You can select either of the following connection modes:
 
 1. Local binding mode: Provide the `IBM MQ lib` path parameter. You can run the IBM MQ test tool on the same server where the IBM MQ runs.
 
@@ -8,9 +8,9 @@ The purpose of the IBM MQ connection test tool is to test whether IBM MQ is conf
 
 ## Usage of the IBM MQ connection test tool
 
-- You need to export JAVA_HOME before the tool is invoked.
+- You need to export the `JAVA_HOME` before you use the IBM MQ connection test tool.
 
-- You can get the whole usage with the command: ./testMQ.sh -help 
+- You can obtain the usage with the command: ./testMQ.sh -help 
 
 - To use the IBM MQ connection test tool in the local binding mode, run the following sample command: 
 ./testMQ.sh -m <qmgr-name> -a <lib-path> [-q <queueName>]
