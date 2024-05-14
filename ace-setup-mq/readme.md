@@ -5,7 +5,7 @@ The following scripts help you to prepare the IBM MQ objects for ACE monitoring.
 # Supported OS
 
 - Ubuntu 20.04
-- RHEL9.4
+- RHEL 9.4
 - AIX 7.2 
 # Instructions for running the `prep-mq.sh` script
 ## Descriptions
