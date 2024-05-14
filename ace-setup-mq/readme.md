@@ -1,5 +1,6 @@
 # Declaration
-The scripts are used to help user to prepare the MQ objects for ace monitoring. Users can modify these scripts on demand for different environments. As a assistant tool, we will not provide offical support to these scripts.
+The following scripts help you to prepare the IBM MQ objects for ACE monitoring. You can modify these scripts on demand for different environments. As an assistant tool, no official support to these scripts are provided.
+
 # Supported OS
 Tested on Ubuntu 20.04, RHEL9.4, AIX 7.2. 
 # Instructions for prep-mq.sh
