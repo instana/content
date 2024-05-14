@@ -19,15 +19,16 @@ The script `setup-channel.sh` creates resources and sets authority correctly in 
 To run the `prep-mq.sh` script, complete the following steps:
 1. Download the `prep-mq.sh` script. 
 2. Make the script executable:
-    ```
-     chmod +x prep-mq.sh
-     ```
-     {: codeblock}
+```
+    chmod +x prep-mq.sh
+```
+{: codeblock}
 3. Go to the directory, and run the script.
 
 ```sh
     ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
 ```
+ {: codeblock}
 # Instructions for running the revert-mq.sh script
 
 ## Descriptions
@@ -42,14 +43,15 @@ To run the `revert-mq.sh` script, complete the following steps:
 
 1. Download the `revert-mq.sh` script.
 2. Make the script executable:
-    ```
+```
     chmod +x revert-mq.sh
-    ```
-    {: codeblock}
+```
+{: codeblock}
 3. Go to the directory, and execute the script.
 ```sh
     ./revert-mq.sh -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-l LISTENER_NAME]  [-c CHANNEL_NAME]  [-t TOPIC_NAME]
 ```
+{: codeblock}
 
 
 
