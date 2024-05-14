@@ -8,7 +8,7 @@ The purpose of the IBM MQ test JAR file is to test whether IBM MQ is configured 
 
 ## Usage of the IBM MQ test JAR file
 
-You can get the whole usge with the command:
+- You can get the whole usage with the command: java -jar ./testMQ.jar 
 java -jar ./testMQ.jar 
 
 The output is like:
