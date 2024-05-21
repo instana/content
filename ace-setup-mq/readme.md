@@ -28,7 +28,7 @@ To run the `prep-mq.sh` script, complete the following steps:
     {: codeblock}
 3. Go to the directory, and run the script:
     ```sh
-    ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>
+    ./prep-mq.sh -q <QMGR_NAME>  -d <MQ_BIN_PATH> -u <AUTH_USER>  [-c CHANNEL_NAME]
     ```
     {: codeblock}
     
@@ -52,7 +52,7 @@ To run the `revert-mq.sh` script, complete the following steps:
     {: codeblock}
 3. Go to the directory, and run the script:
     ```sh
-    ./revert-mq.sh -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-l LISTENER_NAME]  [-c CHANNEL_NAME]  [-t TOPIC_NAME]
+    ./revert-mq.sh -q <QMGR_NAME> -d <MQ_BIN_PATH> [-u AUTH_USER] [-p QMGR_AUTH_REMOVE] [-l LISTENER_NAME]  [-c CHANNEL_NAME]  [-t TOPIC_NAME]
     ```
     {: codeblock}
 
