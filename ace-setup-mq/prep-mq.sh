@@ -9,19 +9,22 @@ printUsage(){
     echo "3. Define a channel and set authrec for it with the specified user."
     echo "4. Check the connectivity of the channel with specified user"
     echo "5. Define a topic or use existing topic object for topic string '$SYS/Broker' and set authrec for it"
-    echo "6. List the useful info you can use to set in configuration.yaml for plugin.ace"
+    echo "6. List the useful info you can use to set in configuration.yaml for plugin.ace and plugin.ibmmq"
     echo -e "\033[1;33mNote: this script will cover most cases, but sometimes if you fail to create the mq objects, please contact IBM Instana support or contact IBM MQ support team for help. \033[0m"
     echo ""
-    echo "Usage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> -u <AUTH_USER>  [-c CHANNEL_NAME]"
+    echo "Usage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> -u <AUTH_USER>  [-c CHANNEL_NAME] [-m]"
     echo "Example: "
-    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.ACE.SVRCONN"
+    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SENSOR.SVRCONN -m" 
+    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -m" 
+    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SENSOR.SVRCONN" 
     echo "      $0 -q QM1 -d /opt/mqm/bin -u root"
     echo ""
     echo "Arguments:"
     echo "  -q  <QMGR_NAME>     Required. Specify the queuemanager name to execute the script with"
     echo "  -d  <MQ_BIN_PATH>   Required. Specify the mq bin path"
-    echo "  -u  <AUTH_USER>     Required. Specify the user to give authority for ace monitoring"
-    echo "  -c  <CHANNEL_NAME>  Optional. Specify the channel to be created. If not specify, the default channel INSTANA.ACE.SVRCONN will be used."    
+    echo "  -u  <AUTH_USER>     Required. Specify the user to give authority for mq/ace monitoring"
+    echo "  -c  <CHANNEL_NAME>  Optional. Specify the channel to be created. If not specify, the default channel INSTANA.SENSOR.SVRCONN will be used."  
+    echo "  -m                  Optional. Set up MQ channel for MQ sensor only. If not set, both channel and topic will be created to support both mq sensor and ace sensor."
 }
 
 # 1. Check the current user has authority to execute MQSC commands
@@ -166,28 +169,30 @@ prepChannelAndTopic(){
 
     if [[ "$OUTPUT" == *"$EXPECTED_OUTPUT"* ]]; then
         echo "INFO: The channel authority is set successfully with output: $EXPECTED_OUTPUT"
-        EXISTING_TOPIC=$(echo "dis TOPIC(*) WHERE(TOPICSTR EQ '$TOPIC_STR')" | runmqsc "$QMGR_NAME")
-        # Create a topic if it doesn't exist
-        if [[ $EXISTING_TOPIC == *"not found"* ]]; then
-            echo "INFO: Topic object with TOPICSTR '$TOPIC_STR' not found. Creating a new one..."
-            echo "DEFINE TOPIC($TOPIC_NAME) TOPICSTR('$TOPIC_STR')" | runmqsc "$QMGR_NAME"
-            TOPIC_NEW=$TOPIC_NAME
-        else
-            echo "INFO: Topic object with TOPICSTR '$TOPIC_STR' already exists."
-            TOPIC_NAME=$(echo "$EXISTING_TOPIC" | sed -n '/TOPIC(\*/d; s/^.*TOPIC(\([^)]*\)).*$/\1/p')
-        fi
-        # Set authrec for the topic
-        echo "$MQSC_SET_AUTH_4_TOPIC" | runmqsc "$QMGR_NAME"
-        echo "INFO: Set authrec for the topic $TOPIC_NAME"
-        # Verify the authrec exists
-        EXISTING_AUTHREC=$(echo "DIS AUTHREC PROFILE($TOPIC_NAME) OBJTYPE(TOPIC) PRINCIPAL('$AUTH_USER')" | runmqsc "$QMGR_NAME")
-        # Print the result 
-        if [[ $EXISTING_AUTHREC == *"not found"* ]]; then
-            echo -e "\033[1;31mERROR: AUTHREC for topic '$TOPIC_NAME' does not exist. Please fix the issue according to the commands execution result. \033[0m"
-            echo "$EXISTING_AUTHREC"
-            exit 1
-        else
-            echo "INFO: AUTHREC for topic '$TOPIC_NAME' exists."
+        if [ "${TYPE}" != "mq" ]; then
+            EXISTING_TOPIC=$(echo "dis TOPIC(*) WHERE(TOPICSTR EQ '$TOPIC_STR')" | runmqsc "$QMGR_NAME")
+            # Create a topic if it doesn't exist
+            if [[ $EXISTING_TOPIC == *"not found"* ]]; then
+                echo "INFO: Topic object with TOPICSTR '$TOPIC_STR' not found. Creating a new one..."
+                echo "DEFINE TOPIC($TOPIC_NAME) TOPICSTR('$TOPIC_STR')" | runmqsc "$QMGR_NAME"
+                TOPIC_NEW=$TOPIC_NAME
+            else
+                echo "INFO: Topic object with TOPICSTR '$TOPIC_STR' already exists."
+                TOPIC_NAME=$(echo "$EXISTING_TOPIC" | sed -n '/TOPIC(\*/d; s/^.*TOPIC(\([^)]*\)).*$/\1/p')
+            fi
+            # Set authrec for the topic
+            echo "$MQSC_SET_AUTH_4_TOPIC" | runmqsc "$QMGR_NAME"
+            echo "INFO: Set authrec for the topic $TOPIC_NAME"
+            # Verify the authrec exists
+            EXISTING_AUTHREC=$(echo "DIS AUTHREC PROFILE($TOPIC_NAME) OBJTYPE(TOPIC) PRINCIPAL('$AUTH_USER')" | runmqsc "$QMGR_NAME")
+            # Print the result 
+            if [[ $EXISTING_AUTHREC == *"not found"* ]]; then
+                echo -e "\033[1;31mERROR: AUTHREC for topic '$TOPIC_NAME' does not exist. Please fix the issue according to the commands execution result. \033[0m"
+                echo "$EXISTING_AUTHREC"
+                exit 1
+            else
+                echo "INFO: AUTHREC for topic '$TOPIC_NAME' exists."
+            fi
         fi
     else
         echo -e "\033[1;31mERROR: The channel authority is failed to set. Fix it by removing the blocking AUTHREC and then rerun the scipt.\033[0m"
@@ -212,29 +217,44 @@ prepChannelAndTopic(){
 
 # 5. Print out useful info you need in setting configuration.yaml
 printConnInfo(){
-    echo -e "\033[1;32mINFO: You have prepared the MQ object for ACE monitoring well. Following Objects and Permissions are new added:\033[0m"
+
+    echo -e "\033[1;32mINFO: You have prepared the MQ objects for Instana monitoring well. Following Objects and Permissions are new added:\033[0m"
     if [ ${#PERMISSIONS_NEW[@]} -ne 0 ]; then
-        echo  -e "\033[1;32mPermissions added on QMGR $QMGR_NAME for user $AUTH_USER: ${PERMISSIONS_NEW[*]}\033[0m"
+        echo  -e "\033[1;32mPermissions added on QMGR $QMGR_NAME for user $AUTH_USER: \033[0m"
+        echo "${PERMISSIONS_NEW[*]}"
     fi
     if [ -n "$LISTENER_NEW" ]; then
-        echo -e "\033[1;32mListener new created:         $LISTENER_NEW\033[0m"
+        echo -e "\033[1;32mListener new created: \033[0m"
+        echo "$LISTENER_NEW"
     fi
-    echo -e "\033[1;32mChannel new created:             $CHANNEL_NAME\033[0m"
+    echo -e "\033[1;32mChannel new created:  \033[0m"           
+    echo "$CHANNEL_NAME"
     echo -e "\033[1;32mAUTHREC and CHLAUTH new added for channel $CHANNEL_NAME:\033[0m"
-    echo "SET CHLAUTH($CHANNEL_NAME) TYPE(BLOCKUSER) USERLIST('nobody') DESCR('Block all users except authorized users')"
-    echo "SET AUTHREC profile($CHANNEL_NAME) objtype(channel) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)"
-    if [ -n "$TOPIC_NEW" ]; then
-        echo -e "\033[1;32mTopic new created:           $TOPIC_NEW\033[0m"
+    echo "CHLAUTH($CHANNEL_NAME) TYPE(BLOCKUSER) USERLIST('nobody') DESCR('Block all users except authorized users')"
+    echo "AUTHREC profile($CHANNEL_NAME) objtype(channel) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)"
+    if [ "${TYPE}" != "mq" ]; then
+        if [ -n "$TOPIC_NEW" ]; then
+            echo -e "\033[1;32mTopic new created:           $TOPIC_NEW\033[0m"
+        fi
+        echo  -e "\033[1;32mAUTHREC new added for topic $TOPIC_NAME:\033[0m"
+        echo "AUTHREC profile($TOPIC_NAME) objtype(topic) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)"
+        echo ""
+
+        echo -e "\033[1;32mYou can set the configuration.yaml for ACE sensor with following info:\033[0m"
+        echo "queuemanagerName:   $QMGR_NAME"
+        echo "mqport:            $AVAILABLE_PORTS (choose one)"
+        echo "channel:            $CHANNEL_NAME"
+        echo "mqUsername:         $AUTH_USER"
+        echo ""
     fi
-    echo  -e "\033[1;32mAUTHREC new added for topic $TOPIC_NAME:\033[0m"
-    echo "SET AUTHREC profile($TOPIC_NAME) objtype(topic) PRINCIPAL('$AUTH_USER') AUTHADD(ALL)"
+
+    echo -e "\033[1;32mYou can set the configuration.yaml for MQ sensor with following info:\033[0m"
+    echo "QUEUE_MANAGER_NAME_1: $QMGR_NAME"
+    echo "port:                 $AVAILABLE_PORTS (choose one)"
+    echo "channel:              $CHANNEL_NAME"
+    echo "username:             $AUTH_USER"
     echo ""
 
-    echo -e "\033[1;32mPlease set the configuration.yaml for ACE sensor with following info:\033[0m"
-    echo -e "\033[1;32m queuemanagerName:   $QMGR_NAME\033[0m"
-    echo -e "\033[1;32m mqport:            $AVAILABLE_PORTS (choose one)\033[0m"
-    echo -e "\033[1;32m channel:            $CHANNEL_NAME\033[0m"
-    echo -e "\033[1;32m mqUsername:         $AUTH_USER\033[0m"
     echo -e "\033[1;32mThis tool only covers basic info, for other info, like user password and SSL related info, please check manually and set properly.\033[0m"
     echo -e  "\033[1;33mINFO: To revert the permissions added and objects created, download the revert-mq.sh script and run like following: \033[0m"
     local opt_p=''
@@ -255,7 +275,7 @@ printConnInfo(){
 
 # 0: Init
 # Define the variables 
-CHANNEL_NAME='INSTANA.ACE.SVRCONN'
+CHANNEL_NAME='INSTANA.SENSOR.SVRCONN'
 TOPIC_NAME='INSTANA.ACE.BROKER.TOPIC'
 TOPIC_STR='$SYS/Broker'
 LISTENER_NAME='INSTANA.ACE.LST'
@@ -264,9 +284,10 @@ AVAILABLE_PORTS=''
 PERMISSIONS_NEW=()
 LISTENER_NEW=''
 TOPIC_NEW=''
+TYPE="ace"
 
 # Check the parameters
-while getopts ":q:d:u:c" opt; do
+while getopts ":q:d:u:c:m" opt; do
     case ${opt} in
         q)
           QMGR_NAME=${OPTARG}
@@ -279,6 +300,9 @@ while getopts ":q:d:u:c" opt; do
           ;;
         c)
           CHANNEL_NAME=${OPTARG}
+          ;;
+        m)
+          TYPE="mq"
           ;;
         ?)
           printUsage
@@ -296,7 +320,7 @@ if [[ -z "$QMGR_NAME" || -z "$MQ_BIN_PATH" || -z "$AUTH_USER" ]]; then
     exit 1
 fi
 if [ -z "$CHANNEL_NAME" ]; then
-    CHANNEL_NAME='INSTANA.ACE.SVRCONN'
+    CHANNEL_NAME='INSTANA.SENSOR.SVRCONN'
 fi
 
 # Define the MQSC commands for channel creating
