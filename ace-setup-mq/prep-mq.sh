@@ -195,7 +195,7 @@ prepChannelAndTopic(){
             fi
         fi
     else
-        echo -e "\033[1;31mERROR: The channel authority is failed to set. Fix it by removing the blocking AUTHREC and then rerun the scipt.\033[0m"
+        echo -e "\033[1;31mERROR: The channel authority is failed to set. Fix it by removing the blocking AUTHREC and then rerun the script.\033[0m"
         echo -e "$OUTPUT"
         echo -e "\033[1;31mNOTE: Following objects/permissions are changed or created, please revert them manually or use script revert-mq.sh to clean up before rerunning: \033[0m"
         if [ ${#PERMISSIONS_NEW[@]} -ne 0 ]; then
