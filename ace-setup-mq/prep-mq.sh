@@ -14,16 +14,16 @@ printUsage(){
     echo ""
     echo "Usage: $0 -q <QMGR_NAME> -d <MQ_BIN_PATH> -u <AUTH_USER>  [-c CHANNEL_NAME] [-m]"
     echo "Example: "
-    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SENSOR.SVRCONN -m" 
+    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SVRCONN -m" 
     echo "      $0 -q QM1 -d /opt/mqm/bin -u root -m" 
-    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SENSOR.SVRCONN" 
+    echo "      $0 -q QM1 -d /opt/mqm/bin -u root -c INSTANA.SVRCONN" 
     echo "      $0 -q QM1 -d /opt/mqm/bin -u root"
     echo ""
     echo "Arguments:"
     echo "  -q  <QMGR_NAME>     Required. Specify the queuemanager name to execute the script with"
     echo "  -d  <MQ_BIN_PATH>   Required. Specify the mq bin path"
     echo "  -u  <AUTH_USER>     Required. Specify the user to give authority for mq/ace monitoring"
-    echo "  -c  <CHANNEL_NAME>  Optional. Specify the channel to be created. If not specify, the default channel INSTANA.SENSOR.SVRCONN will be used."  
+    echo "  -c  <CHANNEL_NAME>  Optional. Specify the channel to be created. If not specify, the default channel INSTANA.SVRCONN will be used."  
     echo "  -m                  Optional. Set up MQ channel for MQ sensor only. If not set, both channel and topic will be created to support both mq sensor and ace sensor."
 }
 
@@ -275,10 +275,10 @@ printConnInfo(){
 
 # 0: Init
 # Define the variables 
-CHANNEL_NAME='INSTANA.SENSOR.SVRCONN'
+CHANNEL_NAME='INSTANA.SVRCONN'
 TOPIC_NAME='INSTANA.ACE.BROKER.TOPIC'
 TOPIC_STR='$SYS/Broker'
-LISTENER_NAME='INSTANA.ACE.LST'
+LISTENER_NAME='INSTANA.LST'
 LISTENER_PORT='2121'
 AVAILABLE_PORTS=''
 PERMISSIONS_NEW=()
@@ -320,7 +320,7 @@ if [[ -z "$QMGR_NAME" || -z "$MQ_BIN_PATH" || -z "$AUTH_USER" ]]; then
     exit 1
 fi
 if [ -z "$CHANNEL_NAME" ]; then
-    CHANNEL_NAME='INSTANA.SENSOR.SVRCONN'
+    CHANNEL_NAME='INSTANA.SVRCONN'
 fi
 
 # Define the MQSC commands for channel creating
