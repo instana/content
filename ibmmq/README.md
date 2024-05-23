@@ -36,6 +36,7 @@ For example, ./testMQ.sh -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUN
 For example, ./testMQ.sh -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
 
 ## Rebuild the IBM MQ connection test JAR file
+
 If you need to update the `./testMQ.jar` file, you can modify the source code in the `src` directory, and run the following command to trigger the rebuild:
 
 ```
