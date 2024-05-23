@@ -34,3 +34,14 @@ For example, ./testMQ.sh -m qmName -a /opt/mqm/java/lib64 -q SYSTEM.ADMIN.ACCOUN
   {: codeblock}
 
 For example, ./testMQ.sh -m qmName -h 1.2.3.4 -p 1801 -c SYSTEM.AUTO.SVRCONN -u root -z dummyPwd -q AAA
+
+## Rebuild the IBM MQ connection test JAR file
+
+If you need to update the `./testMQ.jar` file, you can modify the source code in the `src` directory, and run the following command to trigger the rebuild:
+
+```
+mvn clean package
+```
+{: codeblock}
+
+The new `testMQ-1.0-SNAPSHOT.jar` file is generated in the `target` directory. You can replace the `testMQ.jar` file with the `./target/testMQ-1.0-SNAPSHOT.jar` file and use the IBM MQ connection test tool `./testMQ.sh` with the new `testMQ.jar`file.
