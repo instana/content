@@ -55,24 +55,6 @@ preCheck(){
        echo -e "\033[1;31mERROR: Failed to set the environment\033[0m"
        exit 1
     fi
-
-    # check the nc command for linux and telnet for aix
-    os_type=$(uname -s)
-    if [[ "$os_type" == "Linux" ]]; then 
-        if ! command -v nc >/dev/null 2>&1; then
-            echo -e "\033[1;31mERROR: nc command not found on Linux system, please relaunch the script after you install nc\033[0m"
-            exit 1 
-        else 
-            echo "INFO: nc command is found"
-        fi
-    else
-        if ! command -v telnet >/dev/null 2>&1; then
-            echo -e "\033[1;31mERROR: telnet command not found on non-Linux system, please relaunch the script after you install telnet\033[0m"
-            return 1
-        else 
-            echo "INFO: telnet command is found"
-        fi
-    fi
 }
 
 # check permission
@@ -131,15 +113,37 @@ getListenerPort(){
 
 checkPort() {
     local port="$1"
+    local os_type
     os_type=$(uname -s)
+
     if [ -z "$port" ] || [ "$port" -eq 0 ]; then
         return 1
     fi
-    if [[ "$os_type" == "Linux" ]]; then 
-        nc -zv localhost "$port" >/dev/null 2>&1
+
+    if [[ "$os_type" == "Linux" ]]; then
+        if command -v nc >/dev/null 2>&1; then
+            nc -zv localhost "$port" >/dev/null 2>&1
+            return $?
+        else
+            echo "[INFO] 'nc' command not found. Falling back to 'netstat'."
+        fi
     else
-        telnet localhost "$port" >/dev/null 2>&1
+        if command -v telnet >/dev/null 2>&1; then
+            (echo quit | telnet localhost "$port") >/dev/null 2>&1
+            return $?
+        else
+            echo "[INFO] 'telnet' command not found. Falling back to 'netstat'."
+        fi
     fi
+
+    # common fallback to netstat for both Linux and AIX
+    netstat -an 2>/dev/null | awk -v port="$port" '
+        $0 ~ /LISTEN/ && (
+            ($4 ~ ":" port "$") ||   # Linux style: 0.0.0.0:22
+            ($4 ~ "\\." port "$")     # AIX style: *.22 or 127.0.0.1.8050
+        )
+    ' >/dev/null 2>&1
+    return $?
 }
 
 # 4. Create channel and topic, set authrec for them.
