@@ -48,14 +48,14 @@ Before running this script, ensure you have:
 The simplest way to run the script is by providing the required arguments:
 
 ```bash
-./cleanup_users_final.sh https://your-app-url.com/api MONTHS_LIMIT
+./cleanup_users.sh https://your-app-url.com/api MONTHS_LIMIT
 ```
 
 This will prompt you for the API_TOKEN interactively (recommended for security).
 
 **Example**: Remove users inactive for 6+ months
 ```bash
-./cleanup_users_final.sh https://api.example.com 6
+./cleanup_users.sh https://api.example.com 6
 ```
 
 ### 2. With All Parameters
@@ -63,7 +63,7 @@ This will prompt you for the API_TOKEN interactively (recommended for security).
 You can provide all parameters including the API_TOKEN (though this is less secure):
 
 ```bash
-./cleanup_users_final.sh https://your-app-url.com/api MONTHS_LIMIT your-api-token
+./cleanup_users.sh https://your-app-url.com/api MONTHS_LIMIT your-api-token
 ```
 
 ⚠️ **Security Warning**: This method exposes your token in shell history and process lists.
@@ -77,7 +77,7 @@ For better security, use environment variables for sensitive information:
 export API_TOKEN="your-api-token"
 
 # Run with just the required arguments
-./cleanup_users_final.sh https://api.example.com 6
+./cleanup_users.sh https://api.example.com 6
 ```
 
 ### 4. Using an Environment File
@@ -95,7 +95,7 @@ chmod 600 .env
 
 # Source the environment file and run the script
 source .env
-./cleanup_users_final.sh https://api.example.com 6
+./cleanup_users.sh https://api.example.com 6
 ```
 
 ## Parameters
@@ -167,13 +167,13 @@ sudo yum install jq
 - No users meet the inactivity criteria
 
 **To verify**:
-- Try with a larger MONTHS_LIMIT value
+- Try with a smaller MONTHS_LIMIT value to capture more recently inactive users
 - Check the API response manually using curl
 
 ### Permission denied when running script
 **Solution**: Make the script executable
 ```bash
-chmod +x cleanup_users_final.sh
+chmod +x cleanup_users.sh
 ```
 
 ## Example Workflow
@@ -183,10 +183,10 @@ chmod +x cleanup_users_final.sh
 export API_TOKEN="your-secure-token-here"
 
 # 2. Make script executable (first time only)
-chmod +x cleanup_users_final.sh
+chmod +x cleanup_users.sh
 
 # 3. Run with 6-month threshold
-./cleanup_users_final.sh https://api.example.com 6
+./cleanup_users.sh https://api.example.com 6
 
 # 4. Review the output
 # The script will show:
@@ -234,6 +234,6 @@ Do you want to proceed with removing these users from the tenant? (yes/no)
 For issues or questions:
 1. Check the Troubleshooting section above
 2. Verify all prerequisites are installed
-3. Test with a higher MONTHS_LIMIT to see if any users are found
+3. Test with a lower MONTHS_LIMIT to see if any users are found
 4. Check API endpoint availability and authentication
 5. Check if the API Token has right permission of 'User Management'
