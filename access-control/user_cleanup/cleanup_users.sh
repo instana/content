@@ -60,7 +60,8 @@ DELETE_ENDPOINT="$API_BASE_URL/settings/users/delete"
 
 # ===== DEPENDENCY CHECK =====
 if ! command -v jq >/dev/null 2>&1; then
-    echo "Error: jq is not installed. Please install it with: brew install jq"
+    echo "Error: jq is not installed."
+    echo "Please install jq."
     exit 1
 fi
 
