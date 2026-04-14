@@ -150,6 +150,12 @@ sudo yum install jq
 
 **Solutions**:
 - Verify your API_TOKEN is correct and not expired
+- Ensure the token is properly set in the environment
+
+### Error: "API request failed with HTTP code 403"
+**Cause**: Authorisation failure
+
+**Solutions**:
 - Check if the token has the necessary permissions
 - Ensure the token is properly set in the environment
 
